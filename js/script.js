@@ -128,6 +128,7 @@ chess.onclick = function(e) {
     oneStep(i, j, me);
     if (me) { chessBoard[i][j] = 1; }
 
+    // 更新赢法进度
     for (var k = 0; k < count; k++) {
       if (wins[i][j][k]) {
         myWin[k]++;
@@ -139,11 +140,14 @@ chess.onclick = function(e) {
         }
       }
     }
+
+    // 移交控制权,换下棋方
     if (!over) {
       me = !me;
       computerAI();
     }
   }
+
 
 };
 
