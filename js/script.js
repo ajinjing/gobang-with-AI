@@ -16,7 +16,7 @@ var wins = [];
 for (var i = 0; i < 15; i++) {
   wins[i] = [];
   for (var j = 0; j < 15; j++) {
-    wins[i][j] = [];
+    wins[i][j] = {};
   }
 }
 
@@ -63,7 +63,7 @@ for (var i = 0; i < 11; i++) {
     count++;
   }
 }
-console.log(count);
+console.log('Total ways to win: ' + count);
 
 //
 // 赢法统计数组
@@ -132,15 +132,12 @@ chess.onclick = function(e) {
     // 更新我方各赢法落子进度
     for (var k = 0; k < count; k++) {
       if (wins[i][j][k]) {
-        // 验证该赢法落子进度是否有效
-        if (myWin[k] >= 0 && myWin[k] < 5) {
-          myWin[k]++;
-          computerWin[k] = 6;
-          if (myWin[k] === 5) {
-            window.alert("You Win!");
-            over = true;
-            break;
-          }
+        myWin[k]++;
+        computerWin[k] = 6;
+        if (myWin[k] === 5) {
+          window.alert("You Win!");
+          over = true;
+          break;
         }
       }
     }
@@ -197,7 +194,7 @@ var computerAI = function() {
               computerScore[i][j] += 50000;
 
               // DEBUG
-              // console.log('four: ' + '(' + i + ',' + j + '): ' + computerScore[i][j] + ', ' + myScore[i][j]);
+              console.log('four: ' + '(' + i + ',' + j + '): ' + computerScore[i][j] + ', ' + myScore[i][j]);
             }
           }
         }
@@ -229,21 +226,18 @@ var computerAI = function() {
   chessBoard[u][v] = 2;
 
   // DEBUG
-  // console.log('max: ' + max + ' ai: ' + '(' + u + ',' + v + '). ' + 'computerScore: ' + computerScore[u][v] + ', ' + 'myScore: ' + myScore[u][v]);
+  console.log('max: ' + max + ' ai: ' + '(' + u + ',' + v + '). ' + 'computerScore: ' + computerScore[u][v] + ', ' + 'myScore: ' + myScore[u][v]);
 
 
   // 更新computer各赢法落子进度
   for (var k = 0; k < count; k++) {
     if (wins[u][v][k]) {
-      // 验证该赢法落子进度是否有效
-      if (computerWin[k] >= 0 && computerWin[k] < 5) {
-        computerWin[k]++;
-        myWin[k] = 6;
-        if (computerWin[k] === 5) {
-          window.alert("Computer Win!");
-          over = true;
-          break;
-        }
+      computerWin[k]++;
+      myWin[k] = 6;
+      if (computerWin[k] === 5) {
+        window.alert("Computer Win!");
+        over = true;
+        break;
       }
 
     }
@@ -252,4 +246,37 @@ var computerAI = function() {
     me = !me;
   }
 };
+
+
+//
+// DEBUG function
+//
+/**
+ * [queryK find out which win way]
+ * @param  {[number]} k [a certain win way]
+ * @return {[undefined]}
+ */
+function queryK(k) {
+  for (var x = 0; x < 15; x++) {
+    for (var y = 0; y < 15; y++) {
+      if (wins[x][y][k]) {
+        console.log('(' + x + ',' + y + ')');
+      }
+    }
+  }
+  return;
+}
+
+/**
+ * [queryCoordinate find out win ways involved in a specific coordinate]
+ * @param  {[number]} i
+ * @param  {[number]} j
+ */
+function queryCoordinate(i, j) {
+  for (var k = 0; k < count; k++) {
+    if (wins[i][j][k]) {
+      console.log('win way index: ' + k + '. myWin progress: ' + myWin[k] + '. computerWin progress: ' + computerWin[k]);
+    }
+  }
+}
 
