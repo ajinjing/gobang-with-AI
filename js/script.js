@@ -186,7 +186,7 @@ var computerAI = function() {
             } else if (computerWin[k] == 3) {
               computerScore[i][j] += 2100;
             } else if (computerWin[k] == 4) {
-              computerScore[i][j] += 20000;
+              computerScore[i][j] += 200000;
             }
           }
         }
