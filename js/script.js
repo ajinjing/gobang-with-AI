@@ -22,21 +22,22 @@ for (var i = 0; i < 15; i++) {
 
 var count = 0;
 
-//  横向所有赢法
+// 竖向所有赢法, 五颗棋子竖着摆
 for (var i = 0; i < 15; i++) {
   for (var j = 0; j < 11; j++) {
     for (var k = 0; k < 5; k++) {
-      // wins[行号][列号][某个赢法]
+      // wins[距(0,0)点向右的偏移量][距(0,0)点向下的偏移量][某个赢法]
       wins[i][j + k][count] = true;
     }
     count++;
   }
 }
 
-// 竖向所有赢法
+// 横向所有赢法, 五颗棋子横着摆
 for (var i = 0; i < 15; i++) {
   for (var j = 0; j < 11; j++) {
     for (var k = 0; k < 5; k++) {
+      // wins[距(0,0)点向右的偏移量][距(0,0)点向下的偏移量][某个赢法]
       wins[j + k][i][count] = true;
     }
     count++;
@@ -128,15 +129,18 @@ chess.onclick = function(e) {
     oneStep(i, j, me);
     if (me) { chessBoard[i][j] = 1; }
 
-    // 更新赢法进度
+    // 更新我方各赢法落子进度
     for (var k = 0; k < count; k++) {
       if (wins[i][j][k]) {
-        myWin[k]++;
-        computerWin[k] = 6;
-        if (myWin[k] === 5) {
-          window.alert("You Win!");
-          over = true;
-          break;
+        // 验证该赢法落子进度是否有效
+        if (myWin[k] >= 0 && myWin[k] < 5) {
+          myWin[k]++;
+          computerWin[k] = 6;
+          if (myWin[k] === 5) {
+            window.alert("You Win!");
+            over = true;
+            break;
+          }
         }
       }
     }
@@ -169,7 +173,10 @@ var computerAI = function() {
     for (var j = 0; j < 15; j++) {
       if (chessBoard[i][j] === 0) {
         for (var k = 0; k < count; k++) {
+          // 如果该点存在赢法, 根据该赢法去赢法数组找到该赢法目前的落子进度,
+          // 根据落子进度赋予分值
           if (wins[i][j][k]) {
+            // 去我方赢法数组查询落子进度, 并赋予分值
             if (myWin[k] == 1) {
               myScore[i][j] += 200;
             } else if (myWin[k] == 2) {
@@ -179,6 +186,7 @@ var computerAI = function() {
             } else if (myWin[k] == 4) {
               myScore[i][j] += 10000;
             }
+            // 去computer的赢法数组查询落子进度, 并赋予分值
             if (computerWin[k] == 1) {
               computerScore[i][j] += 220;
             } else if (computerWin[k] == 2) {
@@ -186,10 +194,14 @@ var computerAI = function() {
             } else if (computerWin[k] == 3) {
               computerScore[i][j] += 2100;
             } else if (computerWin[k] == 4) {
-              computerScore[i][j] += 200000;
+              computerScore[i][j] += 50000;
+
+              // DEBUG
+              // console.log('four: ' + '(' + i + ',' + j + '): ' + computerScore[i][j] + ', ' + myScore[i][j]);
             }
           }
         }
+
         if (myScore[i][j] > max) {
           max = myScore[i][j];
           u = i;
@@ -199,15 +211,15 @@ var computerAI = function() {
             u = i;
             v = j;
           }
-          if (computerScore[i][j] > max) {
-            max = computerScore[i][j];
+        }
+        if (computerScore[i][j] > max) {
+          max = computerScore[i][j];
+          u = i;
+          v = j;
+        } else if (computerScore[i][j] == max) {
+          if (myScore[i][j] > myScore[u][v]) {
             u = i;
             v = j;
-          } else if (computerScore[i][j] == max) {
-            if (myScore[i][j] > myScore[u][v]) {
-              u = i;
-              v = j;
-            }
           }
         }
       }
@@ -215,17 +227,29 @@ var computerAI = function() {
   }
   oneStep(u, v, false);
   chessBoard[u][v] = 2;
+
+  // DEBUG
+  // console.log('max: ' + max + ' ai: ' + '(' + u + ',' + v + '). ' + 'computerScore: ' + computerScore[u][v] + ', ' + 'myScore: ' + myScore[u][v]);
+
+
+  // 更新computer各赢法落子进度
   for (var k = 0; k < count; k++) {
     if (wins[u][v][k]) {
-      computerWin[k]++;
-      myWin[k] = 6;
-      if (computerWin[k] === 5) {
-        window.alert("Computer Win!");
-        over = true;
+      // 验证该赢法落子进度是否有效
+      if (computerWin[k] >= 0 && computerWin[k] < 5) {
+        computerWin[k]++;
+        myWin[k] = 6;
+        if (computerWin[k] === 5) {
+          window.alert("Computer Win!");
+          over = true;
+          break;
+        }
       }
+
     }
   }
   if (!over) {
     me = !me;
   }
 };
+
