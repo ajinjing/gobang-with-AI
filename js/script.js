@@ -2,6 +2,9 @@ var chessBoard = [];
 var me = true;
 var over = false;
 
+// initiate variable to log coordinates
+var placeLog = [];
+
 for (var i = 0; i < 15; i++) {
   chessBoard[i] = [];
   for (var j = 0; j < 15; j++) {
@@ -16,7 +19,7 @@ var wins = [];
 for (var i = 0; i < 15; i++) {
   wins[i] = [];
   for (var j = 0; j < 15; j++) {
-    wins[i][j] = [];
+    wins[i][j] = {};
   }
 }
 
@@ -63,7 +66,7 @@ for (var i = 0; i < 11; i++) {
     count++;
   }
 }
-console.log(count);
+console.log('Total ways to win: ' + count);
 
 //
 // 赢法统计数组
@@ -128,19 +131,19 @@ chess.onclick = function(e) {
   if (chessBoard[i][j] === 0) {
     oneStep(i, j, me);
     if (me) { chessBoard[i][j] = 1; }
+    // log coordinates
+    placeLog.push([i,j]);
+
 
     // 更新我方各赢法落子进度
     for (var k = 0; k < count; k++) {
       if (wins[i][j][k]) {
-        // 验证该赢法落子进度是否有效
-        if (myWin[k] >= 0 && myWin[k] < 5) {
-          myWin[k]++;
-          computerWin[k] = 6;
-          if (myWin[k] === 5) {
-            window.alert("You Win!");
-            over = true;
-            break;
-          }
+        myWin[k]++;
+        computerWin[k] = 6;
+        if (myWin[k] === 5) {
+          window.alert("You Win!");
+          over = true;
+          break;
         }
       }
     }
@@ -171,37 +174,40 @@ var computerAI = function() {
   }
   for (var i = 0; i < 15; i++) {
     for (var j = 0; j < 15; j++) {
+      // 检验是否已落子
       if (chessBoard[i][j] === 0) {
         for (var k = 0; k < count; k++) {
           // 如果该点存在赢法, 根据该赢法去赢法数组找到该赢法目前的落子进度,
           // 根据落子进度赋予分值
+          // 每个可用点都有一个myScore和computerScore
           if (wins[i][j][k]) {
             // 去我方赢法数组查询落子进度, 并赋予分值
             if (myWin[k] == 1) {
-              myScore[i][j] += 200;
+              myScore[i][j] += 100;
             } else if (myWin[k] == 2) {
-              myScore[i][j] += 400;
-            } else if (myWin[k] == 3) {
               myScore[i][j] += 2000;
+            } else if (myWin[k] == 3) {
+              myScore[i][j] += 6000;
             } else if (myWin[k] == 4) {
-              myScore[i][j] += 10000;
+              myScore[i][j] += 30000;
             }
             // 去computer的赢法数组查询落子进度, 并赋予分值
             if (computerWin[k] == 1) {
               computerScore[i][j] += 220;
             } else if (computerWin[k] == 2) {
-              computerScore[i][j] += 420;
+              computerScore[i][j] += 2700;
             } else if (computerWin[k] == 3) {
-              computerScore[i][j] += 2100;
+              computerScore[i][j] += 8000;
             } else if (computerWin[k] == 4) {
-              computerScore[i][j] += 50000;
+              computerScore[i][j] += 1000000;
 
               // DEBUG
-              // console.log('four: ' + '(' + i + ',' + j + '): ' + computerScore[i][j] + ', ' + myScore[i][j]);
+              console.log('four: ' + '(' + i + ',' + j + '): ' + computerScore[i][j] + ', ' + myScore[i][j]);
             }
           }
         }
 
+        // max是所有点共享的
         if (myScore[i][j] > max) {
           max = myScore[i][j];
           u = i;
@@ -225,25 +231,27 @@ var computerAI = function() {
       }
     }
   }
+  // DEBUG
+  queryCoordinate(u,v);
+  console.log('max: ' + max + ' ai: ' + '(' + u + ',' + v + '). ' + 'computerScore: ' + computerScore[u][v] + ', ' + 'myScore: ' + myScore[u][v]);
+
   oneStep(u, v, false);
   chessBoard[u][v] = 2;
 
-  // DEBUG
-  // console.log('max: ' + max + ' ai: ' + '(' + u + ',' + v + '). ' + 'computerScore: ' + computerScore[u][v] + ', ' + 'myScore: ' + myScore[u][v]);
+  // log coordinates
+  placeLog.push([u,v]);
+
 
 
   // 更新computer各赢法落子进度
   for (var k = 0; k < count; k++) {
     if (wins[u][v][k]) {
-      // 验证该赢法落子进度是否有效
-      if (computerWin[k] >= 0 && computerWin[k] < 5) {
-        computerWin[k]++;
-        myWin[k] = 6;
-        if (computerWin[k] === 5) {
-          window.alert("Computer Win!");
-          over = true;
-          break;
-        }
+      computerWin[k]++;
+      myWin[k] = 6;
+      if (computerWin[k] === 5) {
+        window.alert("Computer Win!");
+        over = true;
+        break;
       }
 
     }
@@ -253,3 +261,41 @@ var computerAI = function() {
   }
 };
 
+
+//
+// DEBUG function
+//
+/**
+ * [queryK find out which win way]
+ * @param  {[number]} k [a certain win way]
+ * @return {[undefined]}
+ */
+function queryK(k) {
+  for (var x = 0; x < 15; x++) {
+    for (var y = 0; y < 15; y++) {
+      if (wins[x][y][k]) {
+        console.log('(' + x + ',' + y + ')');
+      }
+    }
+  }
+  return;
+}
+
+/**
+ * [queryCoordinate find out win ways involved in a specific coordinate
+ * and each win way progress]
+ * @param  {[number]} i
+ * @param  {[number]} j
+ */
+function queryCoordinate(i, j) {
+  for (var k = 0; k < count; k++) {
+    if (wins[i][j][k]) {
+      console.log('win way index: ' + k + '. myWin progress: ' + myWin[k] + '. computerWin progress: ' + computerWin[k]);
+    }
+  }
+  return;
+}
+
+// score weight pattern
+// my([3,2,1])<com([2,2,2,1])<my([3,3,2,1])
+// com([2,2,2,1], [1,1,1,1], [1,1,1,1]) < my([2,2,2,1],[2,2,1])
