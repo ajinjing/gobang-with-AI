@@ -185,7 +185,7 @@ var computerAI = function() {
             if (myWin[k] == 1) {
               myScore[i][j] += 100;
             } else if (myWin[k] == 2) {
-              myScore[i][j] += 1000;
+              myScore[i][j] += 1500;
             } else if (myWin[k] == 3) {
               myScore[i][j] += 6000;
             } else if (myWin[k] == 4) {
@@ -195,7 +195,7 @@ var computerAI = function() {
             if (computerWin[k] == 1) {
               computerScore[i][j] += 220;
             } else if (computerWin[k] == 2) {
-              computerScore[i][j] += 1700;
+              computerScore[i][j] += 2700;
             } else if (computerWin[k] == 3) {
               computerScore[i][j] += 8000;
             } else if (computerWin[k] == 4) {
@@ -293,5 +293,6 @@ function queryCoordinate(i, j) {
       console.log('win way index: ' + k + '. myWin progress: ' + myWin[k] + '. computerWin progress: ' + computerWin[k]);
     }
   }
+  return;
 }
 
