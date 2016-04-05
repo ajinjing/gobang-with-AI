@@ -185,7 +185,7 @@ var computerAI = function() {
             if (myWin[k] == 1) {
               myScore[i][j] += 100;
             } else if (myWin[k] == 2) {
-              myScore[i][j] += 1500;
+              myScore[i][j] += 2000;
             } else if (myWin[k] == 3) {
               myScore[i][j] += 6000;
             } else if (myWin[k] == 4) {
@@ -296,3 +296,6 @@ function queryCoordinate(i, j) {
   return;
 }
 
+// score weight pattern
+// my([3,2,1])<com([2,2,2,1])<my([3,3,2,1])
+// com([2,2,2,1], [1,1,1,1], [1,1,1,1]) < my([2,2,2,1],[2,2,1])
