@@ -81,6 +81,7 @@ var context = chess.getContext('2d');
 
 context.strokeStyle = "#BFBFBF";
 
+// 绘制棋盘,添加水印
 var logo = new Image();
 logo.src = "images/logo.jpg";
 logo.onload = function() {
@@ -98,6 +99,7 @@ var drawChessBoard = function() {
   }
 };
 
+// 绘制棋子
 var oneStep = function(i, j, me) {
   context.beginPath();
   context.arc(15 + i * 30, 15 + j * 30, 13, 0, 2 * Math.PI);
@@ -114,6 +116,7 @@ var oneStep = function(i, j, me) {
   context.fill();
 };
 
+// 我方落子的判断
 chess.onclick = function(e) {
   if (over) {
     return;
@@ -125,6 +128,7 @@ chess.onclick = function(e) {
   var y = e.offsetY;
   var i = Math.floor(x / 30);
   var j = Math.floor(y / 30);
+  // 检验是否落子,空的位置才能落子
   if (chessBoard[i][j] === 0) {
     oneStep(i, j, me);
     if (me) { chessBoard[i][j] = 1; }
@@ -133,16 +137,17 @@ chess.onclick = function(e) {
     for (var k = 0; k < count; k++) {
       if (wins[i][j][k]) {
         // 验证该赢法落子进度是否有效
-        if (myWin[k] >= 0 && myWin[k] < 5) {
-          myWin[k]++;
-          computerWin[k] = 6;
-          if (myWin[k] === 5) {
-            window.alert("You Win!");
-            over = true;
-            break;
-          }
+        // 若为myWin[k]设置0到4的范围会导致赢法数组落子进度的更新错误
+        // if (myWin[k] >= 0 && myWin[k] < 5) {
+        myWin[k]++;
+        computerWin[k] = 6;
+        if (myWin[k] === 5) {
+          window.alert("You Win!");
+          over = true;
+          break;
         }
       }
+      // }
     }
 
     // 移交控制权,换下棋方
@@ -151,10 +156,9 @@ chess.onclick = function(e) {
       computerAI();
     }
   }
-
-
 };
 
+// computer落子的判断
 var computerAI = function() {
   var myScore = [];
   var computerScore = [];
@@ -171,10 +175,12 @@ var computerAI = function() {
   }
   for (var i = 0; i < 15; i++) {
     for (var j = 0; j < 15; j++) {
+      // 检验是否落子,空的位置才能落子
       if (chessBoard[i][j] === 0) {
         for (var k = 0; k < count; k++) {
           // 如果该点存在赢法, 根据该赢法去赢法数组找到该赢法目前的落子进度,
           // 根据落子进度赋予分值
+          // 每个可用点都有一个myScore和computerScore
           if (wins[i][j][k]) {
             // 去我方赢法数组查询落子进度, 并赋予分值
             if (myWin[k] == 1) {
@@ -192,7 +198,7 @@ var computerAI = function() {
             } else if (computerWin[k] == 2) {
               computerScore[i][j] += 420;
             } else if (computerWin[k] == 3) {
-              computerScore[i][j] += 2100;
+              computerScore[i][j] += 5000;
             } else if (computerWin[k] == 4) {
               computerScore[i][j] += 50000;
 
@@ -201,7 +207,7 @@ var computerAI = function() {
             }
           }
         }
-
+        // max是局部变量,所有点共享
         if (myScore[i][j] > max) {
           max = myScore[i][j];
           u = i;
@@ -225,31 +231,53 @@ var computerAI = function() {
       }
     }
   }
+
   oneStep(u, v, false);
   chessBoard[u][v] = 2;
 
   // DEBUG
-  // console.log('max: ' + max + ' ai: ' + '(' + u + ',' + v + '). ' + 'computerScore: ' + computerScore[u][v] + ', ' + 'myScore: ' + myScore[u][v]);
-
+  // console.log(' ai: ' + '(' + u + ',' + v + '). ' + 'computerScore: ' + computerScore[u][v] + ', ' + 'myScore: ' + myScore[u][v]);
 
   // 更新computer各赢法落子进度
   for (var k = 0; k < count; k++) {
     if (wins[u][v][k]) {
       // 验证该赢法落子进度是否有效
-      if (computerWin[k] >= 0 && computerWin[k] < 5) {
-        computerWin[k]++;
-        myWin[k] = 6;
-        if (computerWin[k] === 5) {
-          window.alert("Computer Win!");
-          over = true;
-          break;
-        }
+      // 若为computerWin[k]设置0到4的范围会导致赢法数组落子进度的更新错误
+      // if (computerWin[k] >= 0 && computerWin[k] < 5) {
+      computerWin[k]++;
+      myWin[k] = 6;
+      if (computerWin[k] === 5) {
+        window.alert("Computer Win!");
+        over = true;
+        break;
       }
-
     }
+    // }
   }
   if (!over) {
     me = !me;
   }
 };
 
+//queryK find out which win way,to export coordinate of five point
+//查询某个赢法对应哪条线,输出对应五个点的坐标
+// function queryK(k) {
+//   for (var x = 0; x < 15; x++) {
+//     for (var y = 0; y < 15; y++) {
+//       if (wins[x][y][k]) {
+//         console.log('(' + x + ',' + y + ')');
+//       }
+//     }
+//   }
+//   return;
+// }
+
+//queryCoordinate find out win ways involved in a specific coordinate
+// 查询某个特定点的赢法进度及所在的是哪种赢法
+// function queryCoordinate(i, j) {
+//   for (var k = 0; k < count; k++) {
+//     if (wins[i][j][k]) {
+//       console.log('win way index: ' + k + '. myWin progress: ' + myWin[k] + '. computerWin progress: ' + computerWin[k]);
+//     }
+//   }
+// }
