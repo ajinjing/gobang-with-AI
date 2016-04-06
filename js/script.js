@@ -131,6 +131,7 @@ chess.onclick = function(e) {
   // 检验是否落子,空的位置才能落子
   if (chessBoard[i][j] === 0) {
     oneStep(i, j, me);
+    console.log(' my: ' + '(' + i + ',' + j + ')');
     if (me) { chessBoard[i][j] = 1; }
 
     // 更新我方各赢法落子进度
@@ -184,23 +185,23 @@ var computerAI = function() {
           if (wins[i][j][k]) {
             // 去我方赢法数组查询落子进度, 并赋予分值
             if (myWin[k] == 1) {
-              myScore[i][j] += 200;
+              myScore[i][j] += 100;
             } else if (myWin[k] == 2) {
-              myScore[i][j] += 400;
+              myScore[i][j] += 2330;
             } else if (myWin[k] == 3) {
-              myScore[i][j] += 2000;
+              myScore[i][j] += 6000;
             } else if (myWin[k] == 4) {
-              myScore[i][j] += 10000;
+              myScore[i][j] += 30000;
             }
             // 去computer的赢法数组查询落子进度, 并赋予分值
             if (computerWin[k] == 1) {
-              computerScore[i][j] += 220;
+              computerScore[i][j] += 120;
             } else if (computerWin[k] == 2) {
-              computerScore[i][j] += 420;
+              computerScore[i][j] += 2800;
             } else if (computerWin[k] == 3) {
-              computerScore[i][j] += 5000;
+              computerScore[i][j] += 8000;
             } else if (computerWin[k] == 4) {
-              computerScore[i][j] += 50000;
+              computerScore[i][j] += 1000000;
 
               // DEBUG
               // console.log('four: ' + '(' + i + ',' + j + '): ' + computerScore[i][j] + ', ' + myScore[i][j]);
@@ -234,7 +235,7 @@ var computerAI = function() {
 
   oneStep(u, v, false);
   chessBoard[u][v] = 2;
-
+  console.log(' ai: ' + '(' + u + ',' + v + ')');
   // DEBUG
   // console.log(' ai: ' + '(' + u + ',' + v + '). ' + 'computerScore: ' + computerScore[u][v] + ', ' + 'myScore: ' + myScore[u][v]);
 
